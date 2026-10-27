@@ -219,14 +219,14 @@ docker compose -f docker/docker-compose-falkordb-combined.yml logs -f
 
 ### Port Conflicts
 
-If ports 6379, 3000, or 8000 are already in use, modify the port mappings in `docker-compose-falkordb-combined.yml`:
+If ports 6379, 3000, or 8000 are already in use, set different host ports with environment variables (in your shell or a `.env` file next to the compose file):
 
-```yaml
-ports:
-  - "16379:6379"  # Use different external port
-  - "13000:3000"
-  - "18000:8000"
+```bash
+FALKORDB_HOST_PORT=16379 FALKORDB_BROWSER_HOST_PORT=13000 MCP_HOST_PORT=18000 \
+  docker compose -f docker/docker-compose.yml up
 ```
+
+`MCP_BIND_ADDRESS`, `DB_BIND_ADDRESS` and `DB_UI_BIND_ADDRESS` (all default `127.0.0.1`) set the host interface each port is published on. See the variable table in `README.md`.
 
 ## Production Considerations
 
