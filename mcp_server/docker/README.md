@@ -167,9 +167,24 @@ If port 8000 is already in use:
 # Find what's using the port
 lsof -i :8000
 
-# Change the port in docker-compose.yml
-# Under ports section: "8001:8000"
+# Pick a different host port (set in your shell or in a .env file next to the compose file)
+MCP_HOST_PORT=8001 docker compose up
 ```
+
+Host-side ports and the bind address can be set with environment variables, without editing the compose files:
+
+| Variable | Default | Used by |
+|---|---|---|
+| `MCP_BIND_ADDRESS` | `127.0.0.1` | MCP server, all compose files |
+| `MCP_HOST_PORT` | `8000` | MCP server, all compose files |
+| `DB_BIND_ADDRESS` | `127.0.0.1` | FalkorDB (6379) / Neo4j Bolt (7687) |
+| `FALKORDB_HOST_PORT` | `6379` | `docker-compose.yml`, `docker-compose-falkordb.yml` |
+| `NEO4J_BOLT_HOST_PORT` | `7687` | `docker-compose-neo4j.yml` |
+| `DB_UI_BIND_ADDRESS` | `127.0.0.1` | FalkorDB Browser (3000) / Neo4j Browser (7474) |
+| `FALKORDB_BROWSER_HOST_PORT` | `3000` | `docker-compose.yml`, `docker-compose-falkordb.yml` |
+| `NEO4J_HTTP_HOST_PORT` | `7474` | `docker-compose-neo4j.yml` |
+
+Set a bind address to `0.0.0.0` or a specific interface IP to reach that port from other machines. The bind addresses are separate so you can expose the MCP server without also exposing the database, which has no password by default. Only the host side changes; services still listen on their default ports inside the containers.
 
 ### Container Won't Start
 
