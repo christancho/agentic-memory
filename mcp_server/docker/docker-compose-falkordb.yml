@@ -9,14 +9,16 @@ services:
       - "${DB_BIND_ADDRESS:-127.0.0.1}:${FALKORDB_HOST_PORT:-6379}:6379" # Redis/FalkorDB port
       - "${DB_UI_BIND_ADDRESS:-127.0.0.1}:${FALKORDB_BROWSER_HOST_PORT:-3000}:3000" # FalkorDB web UI
     environment:
-      - FALKORDB_PASSWORD=${FALKORDB_PASSWORD:-}
       - BROWSER=${BROWSER:-1}  # Enable FalkorDB Browser UI (set to 0 to disable)
       # Append-only file: every write is logged, so a hard stop loses at most ~1s.
-      - REDIS_ARGS=${REDIS_ARGS:---appendonly yes}
+      # The image ignores FALKORDB_PASSWORD; its run.sh only passes REDIS_ARGS to redis-server,
+      # so a set FALKORDB_PASSWORD becomes --requirepass here (also protects the Browser UI login).
+      - REDIS_ARGS=${REDIS_ARGS:---appendonly yes}${FALKORDB_PASSWORD:+ --requirepass ${FALKORDB_PASSWORD}}
     volumes:
       - falkordb_data:/var/lib/falkordb/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+      # PONG without a password, NOAUTH with one: both mean the server is up.
+      test: ["CMD-SHELL", "redis-cli -p 6379 ping | grep -qE 'PONG|NOAUTH'"]
       interval: 10s
       timeout: 5s
       retries: 5
