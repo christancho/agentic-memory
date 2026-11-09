@@ -3,9 +3,10 @@
 #   docker compose -f docker-compose-falkordb.yml -f docker-compose-falkordb.build.yml up --build
 services:
   falkordb:
-    # Pinned. 6.x can't load data written by 4.x ("effects buffer is version 2, this build
-    # reads 3"): moving between major lines needs a fresh volume or a data migration.
-    image: falkordb/falkordb:6.0.4
+    # Pinned to the 4.22 line. 6.x (Rust rewrite) can't reload its own AOF after Graphiti's
+    # index-creation writes (FalkorDB/FalkorDB#2946, open): it crash-loops on every restart
+    # with "effects buffer is version 2, this build reads 3". Revisit when #2946 is fixed.
+    image: falkordb/falkordb:v4.22.3
     restart: unless-stopped
     labels:
       # Databases are updated by hand, never by Watchtower
