@@ -3,9 +3,9 @@
 #   docker compose -f docker-compose-falkordb.yml -f docker-compose-falkordb.build.yml up --build
 services:
   falkordb:
-    # Pinned: :latest jumped to 6.x, which can't load data written by 4.22 ("effects buffer
-    # is version 2, this build reads 3"). Upgrade deliberately, after a backup/migration.
-    image: falkordb/falkordb:v4.22.3
+    # Pinned. 6.x can't load data written by 4.x ("effects buffer is version 2, this build
+    # reads 3"): moving between major lines needs a fresh volume or a data migration.
+    image: falkordb/falkordb:6.0.4
     restart: unless-stopped
     labels:
       # Databases are updated by hand, never by Watchtower
